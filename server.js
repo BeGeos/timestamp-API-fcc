@@ -21,9 +21,29 @@ app.get("/api", (req, res) => {
   });
 });
 
+let months = {
+  January: 0,
+  February: 1,
+  March: 2,
+  April: 3,
+  May: 4,
+  June: 5,
+  July: 6,
+  August: 7,
+  September: 8,
+  October: 9,
+  November: 10,
+  December: 11,
+};
+
 app.get("/api/:date", (req, res) => {
   let date_string = req.params.date;
   let unix;
+
+  // console.log(date_string);
+
+  //   console.log(date_string);
+  //   console.log(new Date(date_string));
   // Check if date is unix or other formats
   if (date_string.match(/\d{13}/)) {
     unix = parseInt(date_string);
@@ -31,9 +51,23 @@ app.get("/api/:date", (req, res) => {
       unix,
       utc: new Date(unix).toUTCString(),
     });
+  } else if (date_string.match(/\d{1,2}\s{1,}[a-z]+\s{1,}\d{4}/i)) {
+    let parsed = date_string.split(/\s+/);
+    // console.log(parsed);
+    let day = parseInt(parsed[0]);
+    let month = months[parsed[1]];
+    let year = parseInt(parsed[2]);
+
+    let date = new Date(Date.UTC(year, month, day));
+    // console.log(date);
+    res.json({
+      unix: date.valueOf(),
+      utc: date.toUTCString(),
+    });
   } else {
     let dateObject = new Date(date_string);
 
+    // console.log(dateObject);
     if (dateObject.toString() === "Invalid Date") {
       res.json({ error: "Invalid Date" });
     } else {
